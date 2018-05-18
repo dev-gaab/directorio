@@ -9,6 +9,9 @@
   "installed_plugins": {
     "cordova-plugin-whitelist": {
       "PACKAGE_NAME": "org.directoriopty"
+    },
+    "cordova-plugin-geolocation": {
+      "PACKAGE_NAME": "org.directoriopty"
     }
   },
   "dependent_plugins": {}
