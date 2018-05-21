@@ -26,7 +26,8 @@
 		}
 	</style>
 	<script type="text/javascript" src="cordova.js"></script>
-	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxkvS-ogXxooOcr4cgZcjJn-i5tuiv3mo&libraries=places"></script>
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxkvS-ogXxooOcr4cgZcjJn-i5tuiv3mo&libraries=places"
+	 async defer></script>
 	<script type="text/javascript" src="./js/index.js"></script>
 	<script type="text/javascript" src="./js/jquery.js"></script>
 	<script type="text/javascript" src="./jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
@@ -110,30 +111,34 @@
 	</div>
 	<!-- <script type="text/javascript" src="cordova.js"></script> -->
 	<script type="text/javascript">
-		inp = document.getElementById('city');
-		// maps.controls[google.maps.ControlPosition.TOP_LEFT].push(inp);
-		var options = {
-			types: ['(cities)'],
-			componentRestrictions: { country: 'pa' }
-		};
-
-		autocomplete = new google.maps.places.Autocomplete(inp, options);
 
 		var markers = [];
 		var loc;
 		var address;
-		// mostrar y centrar el mapa
-		var map =
-			new google.maps.Map(document.getElementById('map'), {
-				zoom: 11,
-				center: { lat: 8.9936, lng: -79.5201 }
-			});
+		var map;
 
+		$(document).on("pagecreate", function () {
+			inp = document.getElementById('city');
+			// maps.controls[google.maps.ControlPosition.TOP_LEFT].push(inp);
+			var options = {
+				types: ['(cities)'],
+				componentRestrictions: { country: 'pa' }
+			};
 
+			autocomplete = new google.maps.places.Autocomplete(inp, options);
 
-		var geocoder = new google.maps.Geocoder;
+			// mostrar y centrar el mapa
+			map =
+				new google.maps.Map(document.getElementById('map'), {
+					zoom: 11,
+					center: { lat: 8.9936, lng: -79.5201 }
+				});
+
+		});
 
 		function toDo() {
+
+			var geocoder = new google.maps.Geocoder;
 
 			let loct = {
 				lat: Latitude,
