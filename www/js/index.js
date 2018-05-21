@@ -43,8 +43,6 @@ var onMapSuccess = function (position) {
     Latitude = position.coords.latitude;
     Longitude = position.coords.longitude;
  
-    crear_mapa();
-
 }
 
 function onMapError(error) {
