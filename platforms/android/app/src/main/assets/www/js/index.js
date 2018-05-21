@@ -42,9 +42,7 @@ var onMapSuccess = function (position) {
 
     Latitude = position.coords.latitude;
     Longitude = position.coords.longitude;
-    alert(Latitude+ " // " +Longitude);
-    crear_mapa();
-
+ 
 }
 
 function onMapError(error) {
