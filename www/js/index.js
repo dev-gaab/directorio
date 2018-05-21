@@ -42,6 +42,8 @@ var onMapSuccess = function (position) {
 
     Latitude = position.coords.latitude;
     Longitude = position.coords.longitude;
+
+    toDo();
  
 }
 

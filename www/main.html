@@ -25,6 +25,7 @@
 			background-size: cover;
 		}
 	</style>
+	<script type="text/javascript" src="cordova.js"></script>
 	<script src="./js/index.js"></script>
 	<script src="./js/jquery.js"></script>
 	<script src="./jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
@@ -128,6 +129,55 @@
 				center: { lat: 8.9936, lng: -79.5201 }
 			});
 
+
+
+		var geocoder = new google.maps.Geocoder;
+
+		function toDo() {
+
+			let loct = {
+				lat: Latitude,
+				lng: Longitude
+			};
+
+			map.setCenter(loct);
+
+			geocoder.geocode({ 'location': loct }, function (results, status) {
+
+				if (status === 'OK') {
+
+					if (results[1]) {
+
+						comp = results[1].address_components;
+
+						comp.forEach(function (compo) {
+							if (compo.types[0] == 'locality') {
+								cit = compo.long_name;
+							} else {
+
+								if (cit == null && compo.types[0] == 'administrative_area_level_1') {
+									cit = compo.long_name;
+								}
+
+							}
+
+							if (compo.types[0] == 'country') {
+								count = compo.long_name;
+							}
+
+						});
+
+					} else {
+						window.alert('No results found');
+					}
+
+				} else {
+					window.alert('Geocoder failed due to: ' + status);
+				}
+
+			});
+		}
+
 		function setMapOnAll(map) {
 
 			for (var i = 0; i < markers.length; i++) {
@@ -206,51 +256,6 @@
 			});
 
 			// initMap();
-
-			var geocoder = new google.maps.Geocoder;
-
-
-			let loct = {
-				lat: Latitude,
-				lng: Longitude
-			};
-
-			map.setCenter(loct);
-
-			geocoder.geocode({ 'location': loct }, function (results, status) {
-
-				if (status === 'OK') {
-
-					if (results[1]) {
-
-						comp = results[1].address_components;
-
-						comp.forEach(function (compo) {
-							if (compo.types[0] == 'locality') {
-								cit = compo.long_name;
-							} else {
-
-								if (cit == null && compo.types[0] == 'administrative_area_level_1') {
-									cit = compo.long_name;
-								}
-
-							}
-
-							if (compo.types[0] == 'country') {
-								count = compo.long_name;
-							}
-
-						});
-
-					} else {
-						window.alert('No results found');
-					}
-
-				} else {
-					window.alert('Geocoder failed due to: ' + status);
-				}
-
-			});
 		});
 	</script>
 </body>
