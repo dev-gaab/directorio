@@ -28,12 +28,12 @@
 	<script type="text/javascript" src="cordova.js"></script>
 	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxkvS-ogXxooOcr4cgZcjJn-i5tuiv3mo&libraries=places"
 	 async defer></script>
-	<script type="text/javascript" src="./js/index.js"></script>
-	<script type="text/javascript" src="./js/jquery.js"></script>
-	<script type="text/javascript" src="./jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
-	<script type="text/javascript" src="./js/app/buscador.js"></script>
-	<script type="text/javascript" src="./js/app/main.js"></script>
-	<script type="text/javascript" src="./js/gmaps.js"></script>
+	<script type="text/javascript" src="js/index.js"></script>
+	<script src="js/jquery.js"></script>
+	<script src="jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
+	<script src="js/app/buscador.js"></script>
+	<script src="js/app/main.js"></script>
+	<script src="js/gmaps.js"></script>
 
 </head>
 
@@ -115,31 +115,15 @@
 		var markers = [];
 		var loc;
 		var address;
-		var map;
 
-		$(document).on("pagecreate", function () {
+		var map =
+			new google.maps.Map(document.getElementById('map'), {
+				zoom: 11,
+				center: { lat: 8.9936, lng: -79.5201 }
+			});
 
-			// inp = document.getElementById('city');
-			// maps.controls[google.maps.ControlPosition.TOP_LEFT].push(inp);
-			// var options = {
-			// 	types: ['(cities)'],
-			// 	componentRestrictions: { country: 'pa' }
-			// };
-
-			// autocomplete = new google.maps.places.Autocomplete(inp, options);
-
-			// mostrar y centrar el mapa
-			map =
-				new google.maps.Map(document.getElementById('map'), {
-					zoom: 11,
-					center: { lat: 8.9936, lng: -79.5201 }
-				});
-
-		});
 
 		function toDo() {
-
-			var geocoder = new google.maps.Geocoder;
 
 			let loct = {
 				lat: Latitude,
@@ -147,94 +131,6 @@
 			};
 
 			map.setCenter(loct);
-
-			geocoder.geocode({ 'location': loct }, function (results, status) {
-
-				if (status === 'OK') {
-
-					if (results[1]) {
-
-						comp = results[1].address_components;
-
-						comp.forEach(function (compo) {
-							if (compo.types[0] == 'locality') {
-								cit = compo.long_name;
-							} else {
-
-								if (cit == null && compo.types[0] == 'administrative_area_level_1') {
-									cit = compo.long_name;
-								}
-
-							}
-
-							if (compo.types[0] == 'country') {
-								count = compo.long_name;
-							}
-
-						});
-
-					} else {
-						window.alert('No results found');
-					}
-
-				} else {
-					window.alert('Geocoder failed due to: ' + status);
-				}
-
-			});
-		}
-
-		function setMapOnAll(map) {
-
-			for (var i = 0; i < markers.length; i++) {
-				markers[i].setMap(map);
-			}
-
-		}
-		// funcion para hacer la busqueda cerca de mi
-		function closeTo() {
-
-			setMapOnAll(null);
-			markers = [];
-			var ref = $('#ref').val();
-			// hacemos la peticion de todos los clientes que coincidan
-			$.ajax({
-				type: 'GET',
-				dataType: 'json',
-				data: { references: ref, city: cit, country: count },
-				url: 'http://directorio.hostbtc.com/api/search',
-				success: function (res) {
-
-					var clientes = res.results;
-
-					if (clientes == '') {
-						window.alert('No se encontraron resultados');
-					} else {
-						// agregamos todos los marcadores en el mapa
-						clientes.forEach(function (cliente) {
-
-							var contentString = '<div id="content">' + '<div id="siteNotice">' + '</div>' + '<h1 id="firstHeading" class="firstHeading">' + cliente.name + '</h1>' + '<div id="bodyContent"><p>' + cliente.address + '</p>' + '</div>' + '</div>';
-
-							var marker = new google.maps.Marker({
-								position: { lat: parseFloat(cliente.latitud), lng: parseFloat(cliente.longitud) },
-								map: map
-							});
-
-							var infowindow = new google.maps.InfoWindow;
-							infowindow.setContent(contentString);
-
-							marker.addListener('click', function () {
-								infowindow.open(map, marker);
-							});
-
-							markers.push(marker);
-
-						});
-					}
-
-				}
-
-			});
 		}
 
 		$(document).ready(function () {
@@ -257,11 +153,9 @@
 					});
 
 					$('#categ').append(cat);
-					return;
 				}
 			});
 
-			// initMap();
 		});
 	</script>
 </body>
