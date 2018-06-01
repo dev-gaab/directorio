@@ -43,6 +43,15 @@ var onMapSuccess = function (position) {
     Latitude = position.coords.latitude;
     Longitude = position.coords.longitude;
 
+    inp = document.getElementById('city');
+    // maps.controls[google.maps.ControlPosition.TOP_LEFT].push(inp);
+    var options = {
+    	types: ['(cities)'],
+    	componentRestrictions: { country: 'pa' }
+    };
+
+    autocomplete = new google.maps.places.Autocomplete(inp, options);
+    
     toDo();
  
 }
