@@ -117,12 +117,14 @@
 		var markers = [];
 		var loc;
 		var address;
+		var cit = null;
+		var map;
 
 		function toDo() {
 			
 			var geocoder = new google.maps.Geocoder;
 
-			var map =
+			map =
 				new google.maps.Map(document.getElementById('map'), {
 					zoom: 11,
 					center: { lat: 8.9936, lng: -79.5201 }
@@ -171,6 +173,14 @@
 			});
 		}
 
+		function setMapOnAll(map) {
+
+			for (var i = 0; i < markers.length; i++) {
+				markers[i].setMap(map);
+			}
+
+		}
+
 		// funcion para hacer la busqueda cerca de mi
 		function closeTo() {
 
@@ -188,7 +198,7 @@
 					var clientes = res.results;
 
 					if (clientes == '') {
-						window.alert('No se encontraron resultados');
+						alert('No se encontraron resultados');
 					} else {
 						// agregamos todos los marcadores en el mapa
 						clientes.forEach(function (cliente) {

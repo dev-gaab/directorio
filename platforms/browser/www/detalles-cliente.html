@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+	<link rel="stylesheet" href="./jquery-mobile/jquery.mobile-1.4.5.min.css" />
+	<style type="text/css">
+		.imgStation {
+			width: 320px;
+			/*IMPORTANTE*/
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			margin: 0 auto;
+		}
+
+		#titulo {
+			width: 320px;
+			/*IMPORTANTE*/
+			justify-content: center;
+			align-items: center;
+			margin: 0 auto;
+		}
+
+		#map {
+			height: 400px;
+			width: 100%;
+		}
+
+		#map-ruta {
+			height: 400px;
+			width: 100%;
+		}
+
+		#contenido {
+			background-color: rgba(255, 255, 255, 0.6);
+			margin: 0;
+			padding: 0;
+		}
+
+		#pagina {
+
+			background-image: url("./images/directorio/fondo-opaco.jpg");
+			background-repeat: no-repeat;
+			background-size: cover;
+		}
+	</style>
+
+	<script src="./js/jquery.js"></script>
+	<script src="./jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
+	<script src="./js/app/buscador.js"></script>
+	<script src="./js/app/main.js"></script>
+</head>
+
+<body>
+	<div data-role="role" id="pagina">
+		<div data-role="header" style="overflow: hidden" data-theme="b" data-position="fixed">
+			<img src="./images/directorio/logoGrandeMapa.png" class="ui-li-icon ui-corner-none" style="width: 30px; height: 30px; position: relative; float: left; margin-left: 25%; margin-top: 5px;">
+			<h1>Directorio PTY</h1>
+			<a href="#" data-rel="back" data-ajax="true" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Back</a>
+
+		</div>
+
+		<div class="ui-content" role="main" id="contenido">
+			<div class="imgStation" id="image">
+
+			</div>
+			<div id="titulo">
+
+			</div>
+
+			<div data-role="tabs" id="tabs" style="margin: 10px; padding: 0px; ">
+				<div data-role="navbar">
+					<ul style>
+						<li>
+							<a href="#info" data-ajax="false" data-icon="search" data-theme="b" class="ui-btn-active">
+								<big>Info</big>
+							</a>
+						</li>
+
+						<li>
+							<a href="#mapa" data-ajax="false" data-theme="b" data-icon="location">
+								<big>Ubicación</big>
+							</a>
+						</li>
+
+						<li>
+							<a href="#ruta" data-ajax="false" data-theme="b" data-icon="navigation">
+								<big>Ruta</big>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<!-- contenido de las tabs -->
+
+
+				<div id="info" class="ui-body-d ui-content" style="margin: 0px; padding: 0px; ">
+
+					<ul data-role="listview" data-inset="true" data-divider-theme="b" class="ui-listview ui-listview-inset ui-corner-all ui-shadow"
+					 id="informacion">
+
+					</ul>
+
+				</div>
+
+				<div id="mapa" class="ui-body-d ui-content">
+				
+					<div id="map">
+
+					</div>
+				</div>
+
+
+				<div id="ruta" class="ui-body-d ui-content">
+
+				
+					<div id="map-ruta"></div>
+
+				</div>
+			</div>
+		</div>
+
+		<div data-role="footer" data-position="fixed" data-tab-toggle="false" class="jqm-footer" style="font-size: 10px; text-align: center;">
+			<p>Directorio PTY Version 1.0.0</p>
+		</div>
+	</div>
+
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxkvS-ogXxooOcr4cgZcjJn-i5tuiv3mo&libraries=places"></script>
+
+	<script type="text/javascript" src="./js/gmaps.js"></script>
+
+	<script type="text/javascript">
+		function initMap(lat, long) {
+			var pos = { lat: lat, lng: long };
+			var map = new google.maps.Map(document.getElementById('map'), {
+				zoom: 16,
+				center: pos
+			});
+			var marker = new google.maps.Marker({
+				position: pos,
+				map: map
+			});
+
+		}
+
+		var mapr = new GMaps({
+			el: '#map-ruta',
+			lat: 8.9936,
+			lng: -79.5201
+		});
+
+		function onSuccess (position) {
+	 
+			loc = {lat: position.coords.latitude, lng: position.coords.longitude};
+
+		    mapr.setCenter(loc);
+		};
+
+		// onError Callback receives a PositionError object
+		//
+		function onError(error) {
+			alert('code: ' + error.code + '\n' +
+				'message: ' + error.message + '\n');
+		}
+
+		navigator.geolocation.getCurrentPosition(onSuccess, onError);
+
+		function ruta(lat, long) {
+
+			mapr.drawRoute({
+				origin: [loc.lat, loc.lng],
+				destination: [lat, long],
+				travelMode: 'driving',
+				strokeColor: '#131540',
+				strokeOpacity: 0.6,
+				strokeWeight: 6
+			});
+
+			mapr.addMarker({
+				lat: loc.lat,
+				lng: loc.lng,
+				label: 'A',
+				title: 'Origen',
+			});
+
+			mapr.addMarker({
+				lat: lat,
+				lng: long,
+				label: 'B',
+				title: 'Destino',
+			});
+
+			mapr.setCenter(loc);
+		}
+
+		$(document).on("pagecreate", function () {
+
+			var urlVars = getUrlVars();
+			var cliente;
+			$.mobile.loading("show");
+			$.ajax({
+				type: 'GET',
+				dataType: 'json',
+				url: 'http://directorio.hostbtc.com/api/view',
+				data: { id: urlVars.id },
+				// Mostramos un mensaje con la respuesta
+				success: function (client) {
+
+					var cliente = client.results;
+
+
+					var titulo = '<h1>' + cliente.name + '</h1><p> ' + (cliente.address != null ? cliente.address : "") + '</p>';
+
+					var image = '<img src="' + (cliente.image != null ? cliente.image : "http://icongal.com/gallery/image/89474/gallery_picture_image_photo_landscape.png") + '" width="320" height="220">';
+
+					var descripcion = '<li data-role="list-divider" role="heading" class="ui-li-divider ui-bar-b ui-first-child">Descripcion</li>';
+					var descripcion1 = '<p align="justify"> ' + (cliente.info != null ? cliente.info : "") + '</p>';
+
+					var telefono = '<li data-role="list-divider" role="heading" class="ui-li-divider ui-bar-b">Telefono</li>';
+
+					var telefono1 = '<li class="ui-li-static ui-body-inherit"><a href="tel:' + (cliente.telefono != null ? cliente.telefono : "") + '">' + (cliente.telefono != null ? cliente.telefono : "") + '</a></li>';
+
+					// var telefono2 = '<li class="ui-li-static ui-body-inherit">'+(cliente.telefono2!=null ? cliente.telefono2 : "")+'</li>';
+
+					//var telefono2 = '<li class="ui-li-static ui-body-inherit">'+cliente.telfono2+'</li>';
+					var sw = '<li data-role="list-divider" role="heading" class="ui-li-divider ui-bar-b">Sitio Web</li>';
+
+					var sweb = '<li class="ui-li-static ui-body-inherit"><a href="' + (cliente.website != null ? cliente.website : "") + '">' + (cliente.website != null ? cliente.website : "") + '</li>';
+
+					var em = '<li data-role="list-divider" role="heading" class="ui-li-divider ui-bar-b">Correo</li>';
+
+					var email = '<li class="ui-li-static ui-body-inherit ui-last-child"><a href="mailto:' + (cliente.correo != null ? cliente.correo : "") + '">' + (cliente.correo != null ? cliente.correo : "") + '</li>';
+
+
+					$('#titulo').html(titulo);
+
+					$('#image').html(image);
+
+					$('#informacion').append(descripcion);
+					$('#informacion').append(descripcion1);
+					$('#informacion').append(telefono);
+					$('#informacion').append(telefono1);
+					// $('#informacion').append(telefono2);
+					$('#informacion').append(sw);
+					$('#informacion').append(sweb);
+					$('#informacion').append(em);
+					$('#informacion').append(email);
+
+					initMap(parseFloat(cliente.latitud), parseFloat(cliente.longitud));
+
+					ruta(parseFloat(cliente.latitud), parseFloat(cliente.longitud));
+
+					$.mobile.loading("hide");
+
+				}
+			});
+
+
+		});
+
+	</script>
+</body>
+
+</html>

@@ -117,12 +117,14 @@
 		var markers = [];
 		var loc;
 		var address;
+		var cit = null;
+		var map;
 
 		function toDo() {
 			
 			var geocoder = new google.maps.Geocoder;
 
-			var map =
+			map =
 				new google.maps.Map(document.getElementById('map'), {
 					zoom: 11,
 					center: { lat: 8.9936, lng: -79.5201 }
@@ -166,6 +168,60 @@
 
 				} else {
 					window.alert('Geocoder failed due to: ' + status);
+				}
+
+			});
+		}
+
+		function setMapOnAll(map) {
+
+			for (var i = 0; i < markers.length; i++) {
+				markers[i].setMap(map);
+			}
+
+		}
+
+		// funcion para hacer la busqueda cerca de mi
+		function closeTo() {
+
+			setMapOnAll(null);
+			markers = [];
+			var ref = $('#ref').val();
+			// hacemos la peticion de todos los clientes que coincidan
+			$.ajax({
+				type: 'GET',
+				dataType: 'json',
+				data: { references: ref, city: cit, country: count },
+				url: 'http://directorio.hostbtc.com/api/search',
+				success: function (res) {
+
+					var clientes = res.results;
+
+					if (clientes == '') {
+						alert('No se encontraron resultados');
+					} else {
+						// agregamos todos los marcadores en el mapa
+						clientes.forEach(function (cliente) {
+
+							var contentString = '<div id="content">' + '<div id="siteNotice">' + '</div>' + '<h1 id="firstHeading" class="firstHeading">' + cliente.name + '</h1>' + '<div id="bodyContent"><p>' + cliente.address + '</p>' + '</div>' + '</div>';
+
+							var marker = new google.maps.Marker({
+								position: { lat: parseFloat(cliente.latitud), lng: parseFloat(cliente.longitud) },
+								map: map
+							});
+
+							var infowindow = new google.maps.InfoWindow;
+							infowindow.setContent(contentString);
+
+							marker.addListener('click', function () {
+								infowindow.open(map, marker);
+							});
+
+							markers.push(marker);
+
+						});
+					}
+
 				}
 
 			});
