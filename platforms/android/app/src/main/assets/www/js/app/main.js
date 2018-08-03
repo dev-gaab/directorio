@@ -28,3 +28,9 @@ function appExit(){
         ["Cancel","OK"]
     );
 }
+
+function logout() {
+    window.localStorage.clear();
+
+    setTimeout(function () { $(location).attr('href','login.html'); }, 500);
+}

@@ -27,8 +27,7 @@
 	</style>
 	<!-- Libs -->
 	<script type="text/javascript" src="cordova.js"></script>
-	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxkvS-ogXxooOcr4cgZcjJn-i5tuiv3mo&libraries=places"
-	 async defer></script>
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxkvS-ogXxooOcr4cgZcjJn-i5tuiv3mo&libraries=places"></script>
 	<script src="js/jquery.js"></script>
 	<script src="jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
 	<script src="js/gmaps.js"></script>
@@ -41,9 +40,12 @@
 
 <body>
 	<div data-role="page" id="pagina">
-		<div data-role="header" style="overflow: hidden" data-theme="b">
+		<div data-role="header" style="overflow: hidden" data-theme="b" id="header">
 			<img src="./images/directorio/logoGrandeMapa.png" class="ui-li-icon ui-corner-none" style="width: 30px; height: 30px; position: relative; float: left; margin-left: 25%; margin-top: 5px;">
 			<h1>Directorio PTY</h1>
+			<a href="#" data-rel="back" data-ajax="true" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Atras</a>
+
+
 		</div>
 		<div role="main" class="ui-content" id="contenido">
 			<div data-role="tabs" id="tabs" style="margin: 0px; padding: 0px; ">
@@ -121,7 +123,7 @@
 		var map;
 
 		function toDo() {
-			
+
 			var geocoder = new google.maps.Geocoder;
 
 			map =
@@ -145,7 +147,7 @@
 						comp = results[1].address_components;
 
 						comp.forEach(function (compo) {
-							
+
 							if (compo.types[0] == 'locality') {
 								cit = compo.long_name;
 							} else {
@@ -228,6 +230,11 @@
 		}
 
 		$(document).ready(function () {
+
+			var user = window.localStorage.getItem("user");
+			if (user != null) {
+				$('#header').append('<a href="#" data-ajax="true" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-power" onclick="logout()">Logout</a>');
+			}
 
 			var cat = new Array();
 			var i = 0;

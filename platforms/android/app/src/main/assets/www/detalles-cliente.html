@@ -55,7 +55,7 @@
 
 <body>
 	<div data-role="role" id="pagina">
-		<div data-role="header" style="overflow: hidden" data-theme="b" data-position="fixed">
+		<div data-role="header" style="overflow: hidden" data-theme="b" data-position="fixed" id="header">
 			<img src="./images/directorio/logoGrandeMapa.png" class="ui-li-icon ui-corner-none" style="width: 30px; height: 30px; position: relative; float: left; margin-left: 25%; margin-top: 5px;">
 			<h1>Directorio PTY</h1>
 			<a href="#" data-rel="back" data-ajax="true" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Back</a>
@@ -90,6 +90,12 @@
 								<big>Ruta</big>
 							</a>
 						</li>
+
+						<li>
+							<a href="#ads" data-ajax="false" data-theme="b" data-icon="star">
+								<big>Anuncios</big>
+							</a>
+						</li>
 					</ul>
 				</div>
 				<!-- contenido de las tabs -->
@@ -105,7 +111,7 @@
 				</div>
 
 				<div id="mapa" class="ui-body-d ui-content">
-				
+
 					<div id="map">
 
 					</div>
@@ -114,9 +120,17 @@
 
 				<div id="ruta" class="ui-body-d ui-content">
 
-				
+
 					<div id="map-ruta"></div>
 
+				</div>
+
+
+				<div id="ads" class="ui-body-d ui-content">
+
+					<ul data-role="listview" data-inset="true" id="list-ads">
+
+		    	</ul>
 				</div>
 			</div>
 		</div>
@@ -151,7 +165,7 @@
 		});
 
 		function onSuccess (position) {
-	 
+
 			loc = {lat: position.coords.latitude, lng: position.coords.longitude};
 
 		    mapr.setCenter(loc);
@@ -196,9 +210,17 @@
 
 		$(document).on("pagecreate", function () {
 
+			var user = window.localStorage.getItem("user");
+			if (user != null) {
+				$('#header').append('<a href="#" data-ajax="true" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-power" onclick="logout()">Logout</a>');
+			}
+
 			var urlVars = getUrlVars();
+
 			var cliente;
+
 			$.mobile.loading("show");
+
 			$.ajax({
 				type: 'GET',
 				dataType: 'json',
@@ -207,8 +229,13 @@
 				// Mostramos un mensaje con la respuesta
 				success: function (client) {
 
-					var cliente = client.results;
+					var cliente = client.results.client;
 
+					var ads = client.results.ads;
+
+					var anuncios = new Array();
+
+					var i = 0;
 
 					var titulo = '<h1>' + cliente.name + '</h1><p> ' + (cliente.address != null ? cliente.address : "") + '</p>';
 
@@ -221,9 +248,6 @@
 
 					var telefono1 = '<li class="ui-li-static ui-body-inherit"><a href="tel:' + (cliente.telefono != null ? cliente.telefono : "") + '">' + (cliente.telefono != null ? cliente.telefono : "") + '</a></li>';
 
-					// var telefono2 = '<li class="ui-li-static ui-body-inherit">'+(cliente.telefono2!=null ? cliente.telefono2 : "")+'</li>';
-
-					//var telefono2 = '<li class="ui-li-static ui-body-inherit">'+cliente.telfono2+'</li>';
 					var sw = '<li data-role="list-divider" role="heading" class="ui-li-divider ui-bar-b">Sitio Web</li>';
 
 					var sweb = '<li class="ui-li-static ui-body-inherit"><a href="' + (cliente.website != null ? cliente.website : "") + '">' + (cliente.website != null ? cliente.website : "") + '</li>';
@@ -232,6 +256,14 @@
 
 					var email = '<li class="ui-li-static ui-body-inherit ui-last-child"><a href="mailto:' + (cliente.correo != null ? cliente.correo : "") + '">' + (cliente.correo != null ? cliente.correo : "") + '</li>';
 
+					// recorrer los anuncios.
+					ads.forEach(function (ad) {
+
+						anuncios[i] = '<li class="ui-li-has-thumb ui-first-child"><a href="#" class="ui-btn ui-btn-icon-right ui-icon-carat-r" onclick=\'(mostrarAd("'+ad.id+'"))\' data-theme="b"><img src="'+(ad.image!=null ? ad.image : "http://icongal.com/gallery/image/89474/gallery_picture_image_photo_landscape.png")+'"><h2>'+ad.title+'</h2><p></p></a></li>';
+
+						i++;
+
+					});
 
 					$('#titulo').html(titulo);
 
@@ -250,6 +282,8 @@
 					initMap(parseFloat(cliente.latitud), parseFloat(cliente.longitud));
 
 					ruta(parseFloat(cliente.latitud), parseFloat(cliente.longitud));
+
+					$('#list-ads').html(anuncios);
 
 					$.mobile.loading("hide");
 

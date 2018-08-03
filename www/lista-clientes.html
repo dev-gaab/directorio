@@ -20,7 +20,7 @@
    		}
 
    		#pagina{
-   			
+
    			background-image: url("./images/directorio/fondo-opaco.jpg");
    			background-repeat: no-repeat;
    			background-size: cover;
@@ -29,17 +29,18 @@
 </head>
 <body>
 	<div data-role="page" id="pagina">
-		<div data-role = "header" style="overflow: hidden" data-theme="b" data-position="fixed">
+
+		<div data-role = "header" style="overflow: hidden" data-theme="b" data-position="fixed" id="header">
 			<img src="./images/directorio/logoGrandeMapa.png" class="ui-li-icon ui-corner-none" style="width: 30px; height: 30px; position: relative; float: left; margin-left: 25%; margin-top: 5px;"><h1>Directorio PTY</h1>
 			<a href="#" data-rel="back" data-ajax="true" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Back</a>
-			
+
 		</div>
-	
+
 		<div class="ui-content" role="main" id="contenido">
 
-		    <ul data-role="listview" data-inset="true" id="lista">
-		    	
-		    </ul>
+	    <ul data-role="listview" data-inset="true" id="lista">
+
+	    </ul>
 
 		</div>
 
@@ -53,18 +54,26 @@
 
 	$( document ).on( "pagecreate", function() {
 
+		var user = window.localStorage.getItem("user");
+		if (user != null) {
+			$('#header').append('<a href="#" data-ajax="true" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-power" onclick="logout()">Logout</a>');
+		}
+
 		var urlVars= getUrlVars();
+
 		$.mobile.loading("show");
+
 		var clientes = new Array();
+
 			var i = 0;
 			var data;
 			 // si solo se envio la ciudad
-			if (urlVars.references == '') { 
+			if (urlVars.references == '') {
 				data = {city : urlVars.city, country : 'Panamá'};
 			}else{
 				data = {references : urlVars.references, city : urlVars.city, country : 'Panamá'};
 			}
-		
+
 			$.ajax({
 				type: 'GET',
 				dataType: 'json',
@@ -72,22 +81,22 @@
 				data: data,
 				// Mostramos un mensaje con la respuesta
 				success: function(resp) {
-					
+
 					var clients = resp.results;
-					
+
 					clients.forEach(function (client) {
 
-						clientes[i] = '<li class="ui-li-has-thumb ui-first-child"><a href="#" class="ui-btn ui-btn-icon-right ui-icon-carat-r" onclick=\'(mostrar("'+client.id+'"))\' data-theme="b"><img src="'+(client.avatar!=null ? client.avatar : "http://icongal.com/gallery/image/89474/gallery_picture_image_photo_landscape.png")+'"><h2>'+client.name+'</h2><p>'+(client.address!=null ? client.address : "")+'</p></a></li>';	
+						clientes[i] = '<li class="ui-li-has-thumb ui-first-child"><a href="#" class="ui-btn ui-btn-icon-right ui-icon-carat-r" onclick=\'(mostrar("'+client.id+'"))\' data-theme="b"><img src="'+(client.avatar!=null ? client.avatar : "http://icongal.com/gallery/image/89474/gallery_picture_image_photo_landscape.png")+'"><h2>'+client.name+'</h2><p>'+(client.address!=null ? client.address : "")+'</p></a></li>';
 
 						i++;
 
 					});
-					
+
 					$.mobile.loading("hide");
 					$('#lista').append(clientes);
 				}
 			});
-	
+
 	});
 
 </script>

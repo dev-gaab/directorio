@@ -51,9 +51,9 @@ var onMapSuccess = function (position) {
     };
 
     autocomplete = new google.maps.places.Autocomplete(inp, options);
-    
+
     toDo();
- 
+
 }
 
 function onMapError(error) {

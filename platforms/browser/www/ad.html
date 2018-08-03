@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+
+
+  <link rel="stylesheet" href="./jquery-mobile/jquery.mobile-1.4.5.min.css" />
+  <link rel="stylesheet" type="text/css" href="./css/alerts.css">
+  <script src="./js/jquery.js"></script>
+  <script src="./jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
+  <script src="./js/app/buscador.js"></script>
+  <script src="./js/app/main.js"></script>
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxkvS-ogXxooOcr4cgZcjJn-i5tuiv3mo&libraries=places"></script>
+
+  <style type="text/css">
+    .imgStation {
+      width: 320px;
+      /*IMPORTANTE*/
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto;
+    }
+
+    #titulo, #codigo, #cupon {
+      width: 320px;
+      /*IMPORTANTE*/
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto;
+    }
+
+
+    #contenido{
+      background-color: rgba(255,255,255,0.6);
+      margin: 0;
+      padding: 0;
+    }
+
+    #pagina{
+
+      background-image: url("./images/directorio/fondo-opaco.jpg");
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+  </style>
+</head>
+<body>
+  <div data-role="page" id="pagina">
+    <div data-role = "header" style="overflow: hidden" data-theme="b" data-position="fixed" id="header">
+      <img src="./images/directorio/logoGrandeMapa.png" class="ui-li-icon ui-corner-none" style="width: 30px; height: 30px; position: relative; float: left; margin-left: 25%; margin-top: 5px;"><h1>Directorio PTY</h1>
+      <a href="#" data-rel="back" data-ajax="true" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Back</a>
+
+    </div>
+
+    <div class="ui-content" role="main" id="contenido">
+
+      <div class="imgStation" id="image">
+
+      </div>
+
+      <div id="titulo">
+
+      </div>
+
+      <div class="ui-grid-solo">
+        <div class="ui-block-a" id="codigo"></div>
+      </div>
+
+      <div class="ui-grid-solo">
+        <div class="ui-block-a" id="cupon"></div>
+      </div>
+    </div>
+
+    <div data-role="footer" data-position="fixed" data-tab-toggle="false" class="jqm-footer" style="font-size: 10px; text-align: center;">
+      <p>Directorio PTY Version 1.0.0</p>
+    </div>
+  </div>
+
+<script type="text/javascript">
+
+  // generar y mostrar codigo
+  function codigo (id, title, client_id) {
+    /**
+     * Despues de generar el codigo y mostrarlo mediante ajax se debe restringir a esta persona no poder reclamar mas este codigo.
+     * Para eso en la api debe hacerse una comprobacion antes de registrar al usuario con el codigo..
+     * Despues debemos realizar el envio del correo si todo salio bien mediante ajax y sin mostrar ninguna notificacion y ninguna reaccion en la aplicacion. (colocarla en una funcion aparte)
+     */
+
+    var userId = window.localStorage.getItem("id");
+    var email = window.localStorage.getItem("email");
+
+    var data = {
+      ad_id : id,
+      nombreAd: title,
+      client_id: client_id,
+      user_id: userId,
+      emailUser: email
+    };
+
+    $.ajax({
+      type: 'POST',
+      dataType: 'json',
+      data: data,
+      url: 'http://directorio.hostbtc.com/api/ads/user',
+      success: function (res) {
+        if (res.status == 'OK') {
+          $('#codigo').html('<p style="padding: 10px; text-align: justify;" class="success">Codigo reclamado con exito. Su codigo es ' + res.res +'</p>');
+        } else {
+          $('#codigo').html('<p style="padding: 10px; text-align: justify;" class="error">' + res.res +'</p>');
+        }
+      }
+    });
+
+
+  }
+
+  $( document ).on( "pagecreate", function() {
+
+    var user = window.localStorage.getItem("user");
+    if (user != null) {
+      $('#header').append('<a href="#" data-ajax="true" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-power" onclick="logout()">Logout</a>');
+    }
+
+    var urlVars= getUrlVars();
+
+    $.mobile.loading("show");
+
+
+    $.ajax({
+      type: 'GET',
+      dataType: 'json',
+      url : 'http://directorio.hostbtc.com/api/ads/view/'+urlVars.id,
+      success: function(res) {
+        var ad = res.results;
+
+        var titulo = '<h1>' + ad.title + '</h1><p style="font-size: 135%;"> ' + ad.info + '</p>';
+
+        var email = window.localStorage.getItem("email");
+
+        if (email != null) {
+
+          var cupon = '<a href="#" class="ui-btn ui-shadow ui-corner-all ui-icon-carat-r ui-btn-icon-right" onclick=\'(codigo("'+ad.id+'", "'+ad.title+'", "'+ad.client_id+'"))\'>Reclamar Código</a>';
+
+        } else {
+          var cupon = '<p style="padding: 10px; text-align: justify;" class="info">Para poder reclamar los códigos de los anuncios debe estar logueado en la aplicación. Por favor clickee en el siguiente botón para loguearce.</p> <a href="login.html" data-ajax="false" class="ui-btn ui-shadow ui-corner-all ui-icon-carat-r ui-btn-icon-right">Log In</a>'
+        }
+
+        var image = '<img src="' + (ad.image != null ? ad.image : "http://icongal.com/gallery/image/89474/gallery_picture_image_photo_landscape.png") + '" width="320" height="220">';
+
+        $('#image').html(image);
+        $('#titulo').html(titulo);
+        $('#cupon').html(cupon);
+      }
+    });
+
+  });
+
+</script>
+</body>
+</html>

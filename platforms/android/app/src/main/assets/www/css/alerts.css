@@ -1,0 +1,14 @@
+.error {
+  background-color: #d9534f;
+  color: #f9f9f9;
+}
+
+.success {
+  background-color: #5cb85c;
+  color: #f9f9f9;
+}
+
+.info {
+  background-color: #428bca;
+  color: #f9f9f9;
+}

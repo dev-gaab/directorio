@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+
+
+  <link rel="stylesheet" href="./jquery-mobile/jquery.mobile-1.4.5.min.css" />
+  <link rel="stylesheet" type="text/css" href="./css/alerts.css">
+  <script src="./js/jquery.js"></script>
+  <script src="./jquery-mobile/jquery.mobile-1.4.5.min.js"></script>
+  <script src="./js/app/buscador.js"></script>
+  <script src="./js/app/main.js"></script>
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxkvS-ogXxooOcr4cgZcjJn-i5tuiv3mo&libraries=places"></script>
+
+  <script type="text/javascript">
+    function validate() {
+
+      var user = window.localStorage.getItem("user");
+
+      if (user != null) {
+        $(location).attr('href','main.html');
+      }
+    }
+
+    validate();
+  </script>
+
+  <style type="text/css">
+    #contenido{
+      background-color: rgba(255,255,255,0.6);
+      margin: 0;
+      padding: 0;
+    }
+
+    #pagina{
+
+      background-image: url("./images/directorio/fondo-opaco.jpg");
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+
+    #form-register{
+      margin-top: 10%;
+      margin-left: 5%;
+      margin-right: 5%;
+    }
+  </style>
+</head>
+<body>
+  <div data-role="page" id="pagina">
+    <div data-role = "header" style="overflow: hidden" data-theme="b" data-position="fixed">
+      <img src="./images/directorio/logoGrandeMapa.png" class="ui-li-icon ui-corner-none" style="width: 30px; height: 30px; position: relative; float: left; margin-left: 25%; margin-top: 5px;"><h1>Directorio PTY</h1>
+      <a href="#" data-rel="back" data-ajax="true" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Back</a>
+
+    </div>
+
+    <div class="ui-content" role="main" id="contenido">
+      <div id="form-register">
+        <h1>Registro de usuario</h1>
+        <form onsubmit="register(event)">
+
+          <label for="name"><strong>Nombre:</strong></label>
+          <input type="text" name="name" id="name" placeholder="Nombre y apellido" autocomplete="off" required>
+
+          <label for="correo"><strong>Correo:</strong></label>
+          <input type="email" name="correo" id="correo" placeholder="ejemplo@ejemplo.com" autocomplete="off" required>
+
+          <label for="username"><strong>Nombre de usuario:</strong></label>
+          <input type="text" name="username" id="username" placeholder="Nombre para el Log In" autocomplete="off" required>
+
+          <label for="password"><strong>Contraseña:</strong></label>
+          <input type="password" name="password" id="password" placeholder="Contraseña para el Log In" autocomplete="off" required>
+
+          <button class="ui-shadow ui-btn ui-corner-all ui-btn-b ui-icon-action ui-btn-icon-right" type="submit" id="enviar">Guardar</button>
+        </form>
+
+        <div class="ui-grid-solo" id="alert">
+            
+        </div>
+      </div>
+    </div>
+
+    <div data-role="footer" data-position="fixed" data-tab-toggle="false" class="jqm-footer" style="font-size: 10px; text-align: center;">
+      <p>Directorio PTY Version 1.0.0</p>
+    </div>
+  </div>
+
+<script type="text/javascript">
+  function register (event) {
+    event.preventDefault();
+
+    var data = {
+      name : $('#name').val(),
+      email: $('#correo').val(),
+      username: $('#username').val(),
+      password: $('#password').val(),
+      is_active: true,
+      rol: 'app'
+    };
+
+    $.ajax({
+      type: 'POST',
+      dataType: 'json',
+      data: data,
+      url: 'http://directorio.hostbtc.com/api/register',
+      success: function (res) {
+
+        if (res.status == 'OK') {
+          // Deshabilitar botones e inputs
+          $('button').attr('disabled','disabled');
+          $('a').attr('disabled','disabled');
+          $('input').attr('disabled','disabled');
+          // mostrar alerta
+          var alert = '<div class="ui-block-a success"> <p style="padding: 10px;">Usuario registrado</p></div>';
+
+          $('#alert').html(alert);
+
+          user = res.user;
+          // guardar la sesion
+          window.localStorage.setItem("id", user.id);
+          window.localStorage.setItem("user", user.name);
+          window.localStorage.setItem("email", user.email);
+          // redireccionar a la pagina principal de la app
+          setTimeout(function () { $(location).attr('href','main.html'); }, 1500);
+
+        } else {
+          // mostrar alerta de error...
+          if (res.validateEmail) {
+            var alert = '<div class="ui-block-a error"> <p style="padding: 10px;">Error: '+res.validateEmail+'</p></div>';
+          }
+
+          if (res.validateUser) {
+            var alert = '<div class="ui-block-a error"> <p style="padding: 10px;">Error: '+res.validateUser+'</p></div>';
+          }
+
+          $('#alert').html(alert);
+        }
+      }
+    });
+  }
+
+</script>
+</body>
+</html>
